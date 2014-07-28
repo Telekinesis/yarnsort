@@ -24,7 +24,7 @@ public class MultiColumnSort extends Configured implements Tool
 
 	@Override
 	protected void reduce(
-		MultiColumnKey key,
+	        MultiColumnKey key,
 	        Iterable<Text> values,
 	        org.apache.hadoop.mapreduce.Reducer<MultiColumnKey, Text, NullWritable, Text>.Context context)
 	        throws IOException, InterruptedException
@@ -43,7 +43,7 @@ public class MultiColumnSort extends Configured implements Tool
 	        args);
 	System.exit(ret);
     }
-    
+
     @Override
     public int run(String[] args) throws Exception
     {
@@ -59,17 +59,16 @@ public class MultiColumnSort extends Configured implements Tool
 	job.setReducerClass(MultiColumnSortReducer.class);
 	job.setOutputKeyClass(MultiColumnKey.class);
 	job.setOutputValueClass(Text.class);
-
 	job.setNumReduceTasks(5);
-	job.setPartitionerClass(TotalOrderPartitioner.class);
 	InputSampler.Sampler<MultiColumnKey, Text> sampler = new InputSampler.RandomSampler<MultiColumnKey, Text>(
 	        0.1, 50, 10);
 	Path input = MultiColumnInputFormat.getInputPaths(job)[0];
 	input = input.makeQualified(input.getFileSystem(getConf()));
 	Path partitionFile = new Path(input, "_partitions");
+	InputSampler.writePartitionFile(job, sampler);
+	job.setPartitionerClass(TotalOrderPartitioner.class);
 	TotalOrderPartitioner.setPartitionFile(job.getConfiguration(),
 	        partitionFile);
-	InputSampler.writePartitionFile(job, sampler);
 	// Add to DistributedCache
 	URI partitionUri = new URI(partitionFile.toString() + "#_partitions");
 	job.addCacheFile(partitionUri);
@@ -77,5 +76,5 @@ public class MultiColumnSort extends Configured implements Tool
 
 	return job.waitForCompletion(true) ? 0 : 1;
     }
-    
+
 }

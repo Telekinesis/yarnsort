@@ -12,9 +12,7 @@ public class MultiColumnKey implements WritableComparable<MultiColumnKey>
     private DoubleWritable firstTerm  = new DoubleWritable();
     private DoubleWritable secondTerm = new DoubleWritable();
     
-    public MultiColumnKey()
-    {
-    }
+    public MultiColumnKey(){}
 
     public MultiColumnKey(double first, double second)
     {
